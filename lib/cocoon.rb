@@ -24,7 +24,7 @@ module Cocoon
     module ClassMethods
       def has_subclasses(*array)
         raise ArgumentError, "has_suclasses must set subclasses." if !array
-        subclasses = array.flatten
+        subclasses = array.flatten.map(&:to_s)
       end
 
       def subclass_new(attributes={})
