@@ -16,7 +16,7 @@ module Cocoon
 
   module Sti
     def self.included(base)
-      base.extended ClassMethods
+      base.extend ClassMethods
       base.instance_eval do
         class_attribute :subclasses
       end
