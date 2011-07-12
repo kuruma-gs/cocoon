@@ -30,10 +30,35 @@ module Cocoon
       end
     end
 
+#    def link_to_remove_association_with_type(*args, &block)
+#      if block_given?
+#        f            = args[0]
+#        type         = args[1]
+#        html_options = args[2] || {}
+#        name         = capture(&block)
+#        link_to_remove_association(name, f, html_options)
+#      else
+#        name         = args[0]
+#        f            = args[1]
+#        type         = args[2]
+#        html_options = args[3] || {}
+#
+#        is_dynamic = f.object.new_record?
+#        html_options[:class] = [html_options[:class], "remove_fields #{is_dynamic ? 'dynamic' : 'existing'}"].compact.join(' ')
+#        hidden_field_tag("#{f.object_name}[_destroy]") + link_to(name, '#', html_options)
+#      end
+#    end
+
     # :nodoc:
     def render_association(association, f, new_object)
       f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
         render(association.to_s.singularize + "_fields", :f => builder, :dynamic => true)
+      end
+    end
+
+    def render_association_with_type(association, f, type, new_object)
+      f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
+        render(type.to_s.singularize + "_fields", :f => builder, :dynamic => true)
       end
     end
 
@@ -63,6 +88,33 @@ module Cocoon
 
         new_object = f.object.class.reflect_on_association(association).klass.new
         html_options[:'data-template'] = CGI.escapeHTML(render_association(association, f, new_object)).html_safe
+
+        link_to(name, '#', html_options )
+      end
+    end
+
+    
+    def link_to_add_association_with_type(*args, &block)
+      if block_given?
+        f            = args[0]
+        association  = args[1]
+        type         = args[2]
+        html_options = args[3] || {}
+        link_to_add_association_with_type(capture(&block), f, association, type, html_options)
+      else
+        name         = args[0]
+        f            = args[1]
+        association  = args[2]
+        type         = args[3]
+        html_options = args[4] || {}
+
+        html_options[:class] = [html_options[:class], "add_fields"].compact.join(' ')
+        html_options[:'data-association'] = association.to_s.singularize
+        html_options[:'data-associations'] = association.to_s.pluralize
+
+        #new_object = f.object.class.reflect_on_association(association).klass.new
+        new_object = f.object.class.reflect_on_association(association).klass.subclass_new(_type: type)
+        html_options[:'data-template'] = CGI.escapeHTML(render_association_with_type(association, f, type, new_object)).html_safe
 
         link_to(name, '#', html_options )
       end
