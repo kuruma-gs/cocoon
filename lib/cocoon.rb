@@ -30,7 +30,7 @@ module Cocoon
       def subclass_new(attributes={})
         type = attributes.delete(:_type)
         return self.new(attributes)  if !type
-        raise ArgumentError, "'#{type}' can't be allowed subclass." if !subclasses.include? type
+        raise ArgumentError, "'#{type}' can't be allowed subclass." if !self.subclasses.include? type
         type.constantize.new(attributes)
       end
     end
