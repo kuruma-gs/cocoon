@@ -59,7 +59,7 @@ module Cocoon
     def render_association_with_type(association, f, type, new_object,options={})
       options[:prefix]||=""
       puts "render_association_with_type"
-      puts optons[:prefix].inspect
+      puts options[:prefix].inspect
       f.fields_for(association, new_object, :child_index => "new_#{association}") do |builder|
         render(options[:prefix]+type.to_s.tableize.singularize + "_fields", :f => builder, :dynamic => true)
       end
